@@ -1,45 +1,44 @@
-import { Component } from 'react';
+import { Component, useEffect, useState } from 'react';
 import './App.css';
 import CardList from './CardList';
 import "./index.css"
 import Scroll from './Scroll';
 import SearchBox from './SearchBox';
 
-class App extends Component {
-  constructor() {
-    super()
-    this.state = {
-      robots: [],
-      searchField: ''
-    }
-  }
-  componentDidMount() {
-    fetch('https://jsonplaceholder.typicode.com/users').then(response =>
-      response.json())
-      .then(users => this.setState({ robots: users }));
-  }
-  onSearchChange = (event) => {
-    this.setState({ searchField: event.target.value })
-  }
+function App() {
 
-  render() {
-    const filterRobots = this.state.robots.filter(robots => {
-      return robots.name.toLowerCase().includes(this.state.searchField.toLowerCase())
-    })
-    if (this.state.robots.length === 0) {
-      return <h1>Loading</h1>
-    }
-    else {
-      return (
-        <div className='tc'>
-          <h1>Robo Friends</h1>
-          <SearchBox searchChange={this.onSearchChange} />
-          <Scroll>
-            <CardList robots={filterRobots} />
-          </Scroll>
-        </div>
-      )
-    }
+  const [robots, setRobots] = useState([]);
+  const [searchfiled, setSearchfield] = useState('');
+
+  useEffect(() => {
+    fetch('https://jsonplaceholder.typicode.com/users')
+      .then(response => response.json())
+      .then(users => { setRobots(users) });
+  }, [])
+
+  const onSearchChange = (event) => {
+    setSearchfield(event.target.value)
   }
+  // const filterRobots = robots.filter(robot => {
+  //   return robot.name.toLowerCase().includes(setSearchfield.toLowerCase())
+  // })
+
+  const filteredRobots = robots.filter(robot => {
+    return robot.name.toLowerCase().includes(searchfiled.toLowerCase())
+  })
+  console.log(robots, searchfiled)
+  return !robots.length ?
+    <h1>Loading</h1> :
+    (
+      <div className='tc'>
+        <h1 className='f1'>Robo Friends</h1>
+        <SearchBox searchChange={onSearchChange} />
+        <Scroll>
+          <CardList robots={filteredRobots} />
+        </Scroll>
+      </div>
+    );
 }
+
+
 export default App;
